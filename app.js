@@ -1,6 +1,12 @@
 require('dotenv').config();
 const { App } = require('@slack/bolt');
 const http = require('http');
+const welcomeMessage = [
+    "👋 Hey! Don't mind me, I'm just here to post links to xcancel.com when I see x.com links in chat",
+    "🙅‍♀️ x.com? More like x.comoff it use xcancel.com instead",
+    "🤓 Posted something interesting on x.com? Cool cool, I'll add a link to xcancel.com as well",
+    "👽 Ignore me, I'll just be lurking, posting xcancel.com links when I see x.com ones",
+]
 
 console.log('Starting bot with environment:', {
   hasToken: !!process.env.SLACK_BOT_TOKEN,
@@ -39,7 +45,7 @@ app.event('member_joined_channel', async ({ event, client }) => {
       try {
         await client.chat.postMessage({
           channel: event.channel,
-          text: "👋 Hey! Don't mind me, I'm just here to post links to xcancel.com when I see x.com links in chat."
+          text: welcomeMessage[Math.floor(Math.random() * welcomeMessage.length)]
         });
         console.log('Welcome message sent successfully');
       } catch (error) {
@@ -109,7 +115,7 @@ const server = http.createServer((req, res) => {
     console.log('Successfully connected to Slack workspace:', authTest.team);
 
     // Start HTTP server on the port Render provides or default to 3000
-    const port = process.env.PORT || 3000;
+    const port = process.env.PORT || 3003;
     server.listen(port, () => {
       console.log(`HTTP server is running on port ${port}`);
     });
