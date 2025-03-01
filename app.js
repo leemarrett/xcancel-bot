@@ -1,5 +1,6 @@
 require('dotenv').config();
 const { App } = require('@slack/bolt');
+const http = require('http');
 
 // Initialize the Slack app
 const app = new App({
@@ -58,11 +59,24 @@ app.event('message', async ({ event, client }) => {
   }
 });
 
+// Create a basic HTTP server for Render
+const server = http.createServer((req, res) => {
+  res.writeHead(200);
+  res.end('XCancel bot is running!');
+});
+
 // Start the app
 (async () => {
   try {
+    // Start the Slack app
     await app.start();
     console.log('🚀 XCancel bot is running!');
+
+    // Start HTTP server on the port Render provides or default to 3000
+    const port = process.env.PORT || 3000;
+    server.listen(port, () => {
+      console.log(`HTTP server is running on port ${port}`);
+    });
   } catch (error) {
     console.error('Failed to start app:', error.message);
     process.exit(1);
