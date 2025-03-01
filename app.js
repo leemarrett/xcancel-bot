@@ -39,7 +39,7 @@ app.event('member_joined_channel', async ({ event, client }) => {
       try {
         await client.chat.postMessage({
           channel: event.channel,
-          text: "👋 Hey! I'm going to post links to xcancel.com when I see x.com links in chat."
+          text: "👋 Hey! Don't mind me, I'm just here to post links to xcancel.com when I see x.com links in chat."
         });
         console.log('Welcome message sent successfully');
       } catch (error) {
