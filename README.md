@@ -1,6 +1,6 @@
 # XCancel Slack Bot
 
-A Slack bot that automatically converts x.com and twitter.com links to xcancel.com links.
+A Slack bot that automatically posts links to xcancel.com when it sees a link to x.com or twitter.com.
 
 ## Environment Variables
 
