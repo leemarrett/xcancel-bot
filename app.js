@@ -43,7 +43,7 @@ app.event('message', async ({ event, client }) => {
       const isDM = event.channel_type === 'im';
       const message = isDM 
         ? `Here's your xcancel link:\n${xcancelLinks.join('\n')}`
-        : `Use xcancel instead:\n${xcancelLinks.join('\n')}`;
+        : `No x.com account? I got u:\n${xcancelLinks.join('\n')}`;
 
       await client.chat.postMessage({
         channel: event.channel,
