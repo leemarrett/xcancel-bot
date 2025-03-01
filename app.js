@@ -69,9 +69,15 @@ app.event('message', async ({ event, client }) => {
     console.log('Converted to xcancel links:', xcancelLinks);
     
     try {
+      // Different messages for DMs vs channels
+      const isDM = event.channel_type === 'im';
+      const message = isDM 
+        ? `Here's your xcancel link:\n${xcancelLinks.join('\n')}`
+        : `Use xcancel instead:\n${xcancelLinks.join('\n')}`;
+
       await client.chat.postMessage({
         channel: event.channel,
-        text: `Use xcancel instead:\n${xcancelLinks.join('\n')}`,
+        text: message,
         unfurl_links: true,
         unfurl_media: true
       });
