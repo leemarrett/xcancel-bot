@@ -29,7 +29,14 @@ function convertToXcancel(url) {
 
 // Listen for message events
 app.event('message', async ({ event, client }) => {
-  console.log('Message event received:', event);
+  console.log('==================== NEW MESSAGE ====================');
+  console.log('Message event details:', {
+    channel: event.channel,
+    channel_type: event.channel_type,
+    user: event.user,
+    text: event.text,
+    ts: event.ts
+  });
   
   // Only process messages with text
   if (!event.text) {
@@ -37,12 +44,26 @@ app.event('message', async ({ event, client }) => {
     return;
   }
 
+  // Skip messages from the bot itself
+  try {
+    const authTest = await client.auth.test();
+    if (event.user === authTest.user_id) {
+      console.log('Message is from the bot itself, skipping');
+      return;
+    }
+  } catch (error) {
+    console.error('Error checking bot identity:', error);
+  }
+
   // Check for x.com URLs
   const matches = event.text.match(xUrlRegex);
   if (matches) {
-    console.log('Found matches:', matches);
-    const xcancelLinks = matches.map(url => convertToXcancel(url));
-    console.log('Converted to xcancel links:', xcancelLinks);
+    console.log('Found x.com/twitter.com URLs:', matches);
+    const xcancelLinks = matches.map(url => {
+      const converted = convertToXcancel(url);
+      console.log(`Converting ${url} to ${converted}`);
+      return converted;
+    });
     
     try {
       // Different messages for DMs vs channels
@@ -50,6 +71,12 @@ app.event('message', async ({ event, client }) => {
       const message = isDM 
         ? `Here's your xcancel link:\n${xcancelLinks.join('\n')}`
         : `Use xcancel instead:\n${xcancelLinks.join('\n')}`;
+
+      console.log('Sending message:', {
+        channel: event.channel,
+        isDM,
+        xcancelLinks
+      });
 
       await client.chat.postMessage({
         channel: event.channel,
@@ -60,10 +87,18 @@ app.event('message', async ({ event, client }) => {
       console.log('Successfully sent xcancel links');
     } catch (error) {
       console.error('Error sending reply:', error);
+      // Log the full error details
+      console.error('Full error details:', {
+        name: error.name,
+        message: error.message,
+        code: error.code,
+        data: error.data
+      });
     }
   } else {
     console.log('No x.com URLs found in message');
   }
+  console.log('==================== END MESSAGE ====================\n');
 });
 
 // Create a basic HTTP server for Render
@@ -83,6 +118,7 @@ const server = http.createServer((req, res) => {
     // Test the Slack connection
     const authTest = await app.client.auth.test();
     console.log('Successfully connected to Slack workspace:', authTest.team);
+    console.log('Bot user ID:', authTest.user_id);
 
     // Start HTTP server on the port Render provides or default to 3000
     const port = process.env.PORT || 3000;
