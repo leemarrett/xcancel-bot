@@ -1,0 +1,19 @@
+{
+  "name": "xcancel",
+  "version": "1.0.0",
+  "description": "Slack bot that converts x.com links to xcancel.com",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": ["slack", "bot", "xcancel", "twitter", "x.com"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@slack/bolt": "^3.17.0",
+    "dotenv": "^16.3.1"
+  }
+}
