@@ -30,6 +30,8 @@ npm start
 
 This bot is configured to deploy on Render. Required environment variables should be set in the Render dashboard.
 
+If you're using Render's free tier, use something like uptimerobot.com to ping it and keep it awake.
+
 ## Setup Instructions
 
 1. Create a new Slack App at https://api.slack.com/apps
