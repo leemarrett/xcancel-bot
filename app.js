@@ -1,12 +1,6 @@
 require('dotenv').config();
 const { App } = require('@slack/bolt');
 const http = require('http');
-const welcomeMessage = [
-    "👋 Hey! Don't mind me, I'm just here to post links to xcancel.com when I see x.com links in chat",
-    "🙅‍♀️ x.com? More like x.comoff it use xcancel.com instead",
-    "🤓 Posted something interesting on x.com? Cool cool, I'll add a link to xcancel.com as well",
-    "👽 Ignore me, I'll just be lurking, posting xcancel.com links when I see x.com ones",
-]
 
 console.log('Starting bot with environment:', {
   hasToken: !!process.env.SLACK_BOT_TOKEN,
@@ -32,30 +26,6 @@ function convertToXcancel(url) {
   url = url.replace(/[<>]+$/, '');
   return url.replace(/(?:twitter\.com|x\.com)/i, 'xcancel.com');
 }
-
-// Listen for the bot being added to a channel
-app.event('member_joined_channel', async ({ event, client }) => {
-  console.log('Member joined channel event received:', event);
-  // Check if the member that joined is our bot
-  try {
-    const authTest = await client.auth.test();
-    console.log('Auth test result:', authTest);
-    if (event.user === authTest.user_id) {
-      console.log('Bot was added to channel:', event.channel);
-      try {
-        await client.chat.postMessage({
-          channel: event.channel,
-          text: welcomeMessage[Math.floor(Math.random() * welcomeMessage.length)]
-        });
-        console.log('Welcome message sent successfully');
-      } catch (error) {
-        console.error('Error sending welcome message:', error);
-      }
-    }
-  } catch (error) {
-    console.error('Error in member_joined_channel handler:', error);
-  }
-});
 
 // Listen for message events
 app.event('message', async ({ event, client }) => {
@@ -115,7 +85,7 @@ const server = http.createServer((req, res) => {
     console.log('Successfully connected to Slack workspace:', authTest.team);
 
     // Start HTTP server on the port Render provides or default to 3000
-    const port = process.env.PORT || 3003;
+    const port = process.env.PORT || 3000;
     server.listen(port, () => {
       console.log(`HTTP server is running on port ${port}`);
     });

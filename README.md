@@ -1,6 +1,6 @@
 # XCancel Slack Bot
 
-A Slack bot that automatically posts links to xcancel.com when it sees a link to x.com or twitter.com.
+A Slack bot that automatically converts x.com and twitter.com links to xcancel.com links.
 
 ## Environment Variables
 
@@ -44,7 +44,6 @@ This bot is configured to deploy on Render. Required environment variables shoul
    - `message.channels` (to see messages in channels)
    - `message.groups` (to see messages in private channels)
    - `message.im` (to see direct messages)
-   - `member_joined_channel` (to send welcome messages)
 
 4. Enable Socket Mode in your Slack App settings
 
@@ -66,8 +65,7 @@ This bot is configured to deploy on Render. Required environment variables shoul
 
 For channels:
 1. Invite the bot using `/invite @xcancel` in any channel (public or private)
-2. The bot will send a welcome message when added
-3. Share any x.com or twitter.com links
+2. Share any x.com or twitter.com links
 
 For direct messages:
 1. Start a direct message with @xcancel
@@ -83,5 +81,4 @@ The bot will automatically reply with the xcancel.com version of any x.com or tw
   - Public channels (requires `/invite @xcancel`)
   - Private channels (requires `/invite @xcancel`)
   - Direct messages (just message @xcancel)
-- Sends welcome message when added to channels
 - Supports both www and non-www URLs 
