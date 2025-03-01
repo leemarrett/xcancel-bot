@@ -19,6 +19,22 @@ function convertToXcancel(url) {
   return url.replace(/(?:twitter\.com|x\.com)/i, 'xcancel.com');
 }
 
+// Listen for the bot being added to a channel
+app.event('member_joined_channel', async ({ event, client }) => {
+  // Check if the member that joined is our bot
+  const authTest = await client.auth.test();
+  if (event.user === authTest.user_id) {
+    try {
+      await client.chat.postMessage({
+        channel: event.channel,
+        text: "👋 Hey! I'm going to post links to xcancel.com when I see x.com links in chat.."
+      });
+    } catch (error) {
+      console.error('Error sending welcome message:', error.message);
+    }
+  }
+});
+
 // Listen for message events
 app.event('message', async ({ event, client }) => {
   // Only process messages with text
