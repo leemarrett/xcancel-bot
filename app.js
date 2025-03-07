@@ -7,7 +7,16 @@ const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   socketMode: true,
-  appToken: process.env.SLACK_APP_TOKEN
+  appToken: process.env.SLACK_APP_TOKEN,
+  // Add custom Socket Mode client options
+  socketMode: {
+    reconnect: true,
+    clientOptions: {
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      timeout: 30000
+    }
+  }
 });
 
 // Regular expression to match x.com and twitter.com URLs
@@ -20,6 +29,28 @@ function convertToXcancel(url) {
   return url.replace(/(?:twitter\.com|x\.com)/i, 'xcancel.com');
 }
 
+// Handle Socket Mode lifecycle events
+app.client.on('unable_to_socket_mode_start', async (error) => {
+  console.error('Unable to start Socket Mode:', error.message);
+  // Wait a bit and restart the app
+  setTimeout(() => {
+    console.log('Attempting to restart app...');
+    process.exit(1); // Render will automatically restart the process
+  }, 5000);
+});
+
+app.client.on('disconnected', async () => {
+  console.log('Disconnected from Slack, attempting to reconnect...');
+});
+
+app.client.on('reconnecting', async () => {
+  console.log('Attempting to reconnect to Slack...');
+});
+
+app.client.on('connected', async () => {
+  console.log('Successfully connected to Slack');
+});
+
 // Listen for message events
 app.event('message', async ({ event, client }) => {
   // Only process messages with text
@@ -31,6 +62,7 @@ app.event('message', async ({ event, client }) => {
     if (event.user === authTest.user_id) return;
   } catch (error) {
     console.error('Error checking bot identity:', error.message);
+    return; // Skip processing on error
   }
 
   // Check for x.com URLs
@@ -75,6 +107,20 @@ const server = http.createServer((req, res) => {
     });
   } catch (error) {
     console.error('Failed to start app:', error.message);
-    process.exit(1);
+    // Wait a bit and exit (Render will restart the process)
+    setTimeout(() => process.exit(1), 5000);
   }
-})(); 
+})();
+
+// Handle uncaught errors
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught exception:', error.message);
+  // Wait a bit and exit (Render will restart the process)
+  setTimeout(() => process.exit(1), 5000);
+});
+
+process.on('unhandledRejection', (error) => {
+  console.error('Unhandled rejection:', error.message);
+  // Wait a bit and exit (Render will restart the process)
+  setTimeout(() => process.exit(1), 5000);
+}); 
