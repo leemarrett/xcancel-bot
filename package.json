@@ -4,7 +4,8 @@
   "description": "Slack bot that converts x.com links to xcancel.com",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "test": "node test.js"
   },
   "engines": {
     "node": ">=18.0.0"
