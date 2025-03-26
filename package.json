@@ -9,8 +9,6 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "keywords": ["slack", "bot", "xcancel", "twitter", "x.com"],
-  "author": "",
   "license": "ISC",
   "dependencies": {
     "@slack/bolt": "^3.17.0",
