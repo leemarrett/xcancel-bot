@@ -83,7 +83,8 @@ const server = http.createServer((req, res) => {
 // Start the app
 (async () => {
   try {
-    await app.start(process.env.PORT || 3001);
+    const port = process.env.PORT || 3000;
+    await app.start(port);
     console.log('XCancel bot is running!');
   } catch (error) {
     console.error('Error starting app:', error.message);
