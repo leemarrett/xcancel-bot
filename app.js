@@ -74,9 +74,9 @@ app.event('message', async ({ event, say }) => {
   }
 });
 
-// Create a basic HTTP server for Render
+// Create an HTTP server for Render
 const server = http.createServer((req, res) => {
-  res.writeHead(200);
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
   res.end('XCancel bot is running!');
 });
 
@@ -85,7 +85,9 @@ const server = http.createServer((req, res) => {
   try {
     const port = process.env.PORT || 3000;
     await app.start(port);
-    console.log('XCancel bot is running!');
+    server.listen(port, () => {
+      console.log('XCancel bot is running!');
+    });
   } catch (error) {
     console.error('Error starting app:', error.message);
     process.exit(1);
