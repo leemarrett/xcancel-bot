@@ -1,0 +1,11 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+name: Deploy Check
+description: Run checks to ensure code is ready for deployment to Render
+command: npm test
+trigger: auto
+condition: isEditingFile('app.js') && !isDebugging()
+message: Running pre-deployment checks to ensure code is ready for Render...

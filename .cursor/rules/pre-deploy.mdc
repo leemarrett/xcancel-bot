@@ -1,6 +1,6 @@
 ---
-description: 
-globs: 
+description: Run checks to ensure code is ready for deployment to Render
+globs: ["app.js"]
 alwaysApply: true
 ---
 name: Pre-deployment Checks

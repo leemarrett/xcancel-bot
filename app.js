@@ -12,14 +12,14 @@ const app = new App({
 });
 
 // Regular expression to match x.com and twitter.com URLs
-const xUrlRegex = /https?:\/\/(x\.com|twitter\.com)\/[^\s<>]+/g;
+const xUrlRegex = /<?(https?:\/\/(x\.com|twitter\.com)\/[^\s|>]+)[^>]*>?/g;
 
 // Function to convert x.com URLs to xcancel.com URLs
 function convertToXcancel(url) {
-  // Remove any angle brackets and trailing characters
-  url = url.replace(/^<|>$/g, '');
+  // Extract the actual URL, handling both bare URLs and Slack's formatted URLs
+  const actualUrl = url.match(/<?(https?:\/\/[^|>]+)/)?.[1] || url;
   // Convert to xcancel.com
-  return url.replace(/(?:twitter\.com|x\.com)/i, 'xcancel.com');
+  return actualUrl.replace(/(?:twitter\.com|x\.com)/i, 'xcancel.com');
 }
 
 // Handle Socket Mode lifecycle events
@@ -36,7 +36,7 @@ app.client.on('socket_mode_connecting', () => {
 });
 
 app.client.on('socket_mode_connected', () => {
-  console.log('Connected to Slack');
+  console.log('Connected to Slack!');
 });
 
 app.client.on('socket_mode_disconnected', () => {
