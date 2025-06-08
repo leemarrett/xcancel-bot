@@ -1,5 +1,5 @@
 # Use Node.js 18 as the base image
-FROM node:18-slim
+FROM node:18
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -17,6 +17,10 @@ COPY README.md .
 
 # Set environment variables
 ENV NODE_ENV=production
+
+# Add DNS configuration
+RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf && \
+    echo "nameserver 8.8.4.4" >> /etc/resolv.conf
 
 # Start the application
 CMD ["npm", "start"] 

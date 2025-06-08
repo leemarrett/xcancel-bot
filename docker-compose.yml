@@ -2,8 +2,13 @@ version: '3.8'
 
 services:
   xcancel:
-    build: .
-    container_name: xcancel
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: xcancel-bot
     restart: unless-stopped
     env_file:
-      - .env 
+      - .env
+    labels:
+      - "com.docker.compose.project=xcancel"
+      - "com.docker.compose.service=xcancel" 
