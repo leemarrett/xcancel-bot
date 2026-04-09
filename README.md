@@ -41,11 +41,13 @@ If you're using Render's free tier, use something like uptimerobot.com to ping i
    - `groups:history` (to read messages in private channels)
    - `im:history` (to read direct messages)
    - `im:write` (to send direct messages)
+   - `app_mentions:read` (so `@YourBot` invokes work in channels)
 
 3. Under "Event Subscriptions", subscribe to the following bot events:
    - `message.channels` (to see messages in channels)
    - `message.groups` (to see messages in private channels)
    - `message.im` (to see direct messages)
+   - `app_mention` (to handle `@YourBot https://x.com/...` in channels)
 
 4. Enable Socket Mode in your Slack App settings
 
@@ -67,7 +69,7 @@ If you're using Render's free tier, use something like uptimerobot.com to ping i
 
 For channels:
 1. Invite the bot using `/invite @xcancel` in any channel (public or private)
-2. Share any x.com or twitter.com links
+2. Share any x.com or twitter.com links, or mention the bot with a link (e.g. `@xcancel https://x.com/...`)
 
 For direct messages:
 1. Start a direct message with @xcancel

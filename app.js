@@ -9,8 +9,12 @@ const app = new App({
   appToken: process.env.SLACK_APP_TOKEN
 });
 
-// Regular expression to match x.com and twitter.com URLs
-const xUrlRegex = /<?(https?:\/\/(x\.com|twitter\.com)\/[^\s|>]+)[^>]*>?/g;
+// Fresh RegExp per call so .matchAll is safe (global regexes are stateful)
+function extractXUrls(text) {
+  if (!text) return [];
+  const re = /<?(https?:\/\/(?:x\.com|twitter\.com)\/[^\s|>]+)[^>]*>?/gi;
+  return [...text.matchAll(re)].map((m) => m[1]);
+}
 
 // Function to convert x.com URLs to xcancel.com URLs
 function convertToXcancel(url) {
@@ -18,6 +22,24 @@ function convertToXcancel(url) {
   const actualUrl = url.match(/<?(https?:\/\/[^|>]+)/)?.[1] || url;
   // Convert to xcancel.com
   return actualUrl.replace(/(?:twitter\.com|x\.com)/i, 'xcancel.com');
+}
+
+let botUserId;
+
+function buildResponse(convertedLinks, isDM) {
+  return isDM
+    ? `Here's your xcancel link:\n${convertedLinks.join('\n')}`
+    : `No x.com account? I got u:\n${convertedLinks.join('\n')}`;
+}
+
+async function sayXcancelReply({ say, event, convertedLinks }) {
+  const isDM = event.channel_type === 'im';
+  const response = buildResponse(convertedLinks, isDM);
+  await say(
+    event.thread_ts
+      ? { text: response, thread_ts: event.thread_ts }
+      : response
+  );
 }
 
 // Handle Socket Mode lifecycle events
@@ -45,7 +67,7 @@ app.client.on('socket_mode_error', (error) => {
   console.error('Socket Mode Error:', error.message);
 });
 
-// Listen for message events
+// Listen for message events (bare links; @mention + link is handled by app_mention to avoid duplicate deliveries)
 app.event('message', async ({ event, say }) => {
   try {
     // Skip messages from the bot itself
@@ -54,33 +76,43 @@ app.event('message', async ({ event, say }) => {
     // Skip messages without text
     if (!event.text) return;
 
-    // Find x.com or twitter.com URLs
-    const matches = event.text.match(xUrlRegex);
-    if (!matches) return;
+    // Slack can send both message.* and app_mention for the same @mention message
+    if (botUserId && event.text.includes(`<@${botUserId}>`)) return;
 
-    // Convert URLs to xcancel.com
-    const convertedLinks = matches.map(url => convertToXcancel(url));
+    const convertedLinks = extractXUrls(event.text).map(convertToXcancel);
+    if (convertedLinks.length === 0) return;
 
-    // Send response
-    const isDM = event.channel_type === 'im';
-    const response = isDM 
-      ? `Here's your xcancel link:\n${convertedLinks.join('\n')}`
-      : `No x.com account? I got u:\n${convertedLinks.join('\n')}`;
-
-    // Reply in the same thread when the link was posted in a thread (Slack omits thread_ts for top-level messages)
-    await say(
-      event.thread_ts
-        ? { text: response, thread_ts: event.thread_ts }
-        : response
-    );
+    await sayXcancelReply({ say, event, convertedLinks });
   } catch (error) {
     console.error('Error processing message:', error.message);
+  }
+});
+
+// Explicit @xcancel … invocations (channels only; not fired for DMs)
+app.event('app_mention', async ({ event, say }) => {
+  try {
+    const convertedLinks = extractXUrls(event.text).map(convertToXcancel);
+    if (convertedLinks.length === 0) {
+      const hint =
+        'Include an x.com or twitter.com link in your message and I’ll post the xcancel version.';
+      await say(
+        event.thread_ts
+          ? { text: hint, thread_ts: event.thread_ts }
+          : hint
+      );
+      return;
+    }
+    await sayXcancelReply({ say, event, convertedLinks });
+  } catch (error) {
+    console.error('Error processing app_mention:', error.message);
   }
 });
 
 // Start the app
 (async () => {
   try {
+    const auth = await app.client.auth.test({ token: process.env.SLACK_BOT_TOKEN });
+    botUserId = auth.user_id;
     await app.start();
     console.log('XCancel bot is running!');
   } catch (error) {
