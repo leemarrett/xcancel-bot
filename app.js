@@ -67,7 +67,12 @@ app.event('message', async ({ event, say }) => {
       ? `Here's your xcancel link:\n${convertedLinks.join('\n')}`
       : `No x.com account? I got u:\n${convertedLinks.join('\n')}`;
 
-    await say(response);
+    // Reply in the same thread when the link was posted in a thread (Slack omits thread_ts for top-level messages)
+    await say(
+      event.thread_ts
+        ? { text: response, thread_ts: event.thread_ts }
+        : response
+    );
   } catch (error) {
     console.error('Error processing message:', error.message);
   }
